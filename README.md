@@ -79,3 +79,11 @@ Currently the library supports most Excel functionality, including:
 * Cross-sheet identifiers: `=Sheet1!A8+Sheet2!A8`
 
 I also have a set of unit tests to check in.  Right now, they are using sensitive data, so I am in the process of converting them over.
+
+There are also a lot of things that Excellent can do that are not covered in this README including:
+
+* Save Excel output to a serialized format that can be reloaded by Excellent later.
+* Evaluate Excel data structures on-the-fly, including multi-tabbed Excel documents with cross-tab formulas and variables.
+
+The API will be updated to include how to handle this, and other, features.
+
