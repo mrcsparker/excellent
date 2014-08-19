@@ -78,3 +78,4 @@ Currently the library supports most Excel functionality, including:
 * Ranges : `SUM(A1:B9)`
 * Cross-sheet identifiers: `=Sheet1!A8+Sheet2!A8`
 
+I also have a set of unit tests to check in.  Right now, they are using sensitive data, so I am in the process of converting them over.
