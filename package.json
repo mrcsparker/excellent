@@ -1,0 +1,38 @@
+{
+  "name": "excellent",
+  "description": "Library that converts Excel files and formulas to js-compatible data structures",
+  "version": "0.1.0",
+  "keywords": [
+    "xlsx",
+    "parser"
+  ],
+  "directories": {
+    "lib": "./lib"
+  },
+  "main": "./lib/index.js",
+  "author": "Chris Parker",
+  "engines": [
+    "node"
+  ],
+  "scripts": {
+    "test": "make test"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git@github.com:mrcsparker/excellent.git"
+  },
+  "dependencies": {
+    "underscore": ">=1.4.3",
+    "xmldom": "*",
+    "pegjs": "*",
+    "formulajs": "git://github.com/sutoiku/formula.js.git",
+    "jszip": "git://github.com/Stuk/jszip.git"
+  },
+  "devDependencies": {
+    "mocha": ">=1.7.4",
+    "sinon": ">=1.6.0",
+    "optimist": ">=0.3.4",
+    "fs-extra": "*",
+    "browserify": "*"
+  }
+}

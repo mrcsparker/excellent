@@ -1,0 +1,29 @@
+{
+  "name": "excellent",
+  "version": "0.1.0",
+  "main": "./dist/excellent.js",
+  "readme": "README.md",
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/mrcsparker/excellent.git"
+  },
+  "dependencies": {
+    "underscore": "http://underscorejs.org/underscore-min.js",
+    "jstat": "http://www.jstat.org/jstat-1.0.0.min.js",
+    "numeral": "http://cdnjs.cloudflare.com/ajax/libs/numeral.js/1.4.5/numeral.min.js",
+    "numeric": "http://numericjs.com/lib/numeric-1.2.6.min.js",
+    "underscore.string": "http://epeli.github.io/underscore.string/dist/underscore.string.min.js",
+    "formulajs": "https://github.com/sutoiku/formula.js.git",
+    "jszip": "git://github.com/Stuk/jszip.git",
+    "momentjs": "~2.4.0",
+    "lodash": "~2.2.1"
+  },
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "components",
+    "bower_components",
+    "test",
+    "tests"
+  ]
+}

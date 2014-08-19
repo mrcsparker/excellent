@@ -1,0 +1,53 @@
+html {
+    overflow: -moz-scrollbars-vertical;
+    overflow: scroll;
+}
+
+table.table {
+    font-size: 10px;
+}
+
+table.table td {
+    empty-cells: show;                                                                                                            
+}
+
+table.table thead tr {
+    border: 1px solid #bbb;
+    background-color: #eee;
+}
+
+table.table thead tr th {
+    border-right: 1px solid #bbb;
+}
+
+table.table thead tr th {
+    text-align: center;
+}
+
+table.table tbody tr {
+    border-bottom: 1px solid #eee;
+    border-left: 1px solid #eee;
+    border-right: 1px solid #eee;
+}
+
+table.table tbody tr td.row-number {
+    border-right: 1px solid #bbb;
+    border-left: 1px solid #bbb;
+    border-bottom: 1px solid #bbb;
+    background-color: #eee;
+    font-weight: bold;    
+    text-align: center;
+}
+
+input:focus {
+    background-color: #78FA89;
+}
+
+span.formula {                                                                                                                  
+    padding: 3px;                                                                                                                 
+    display: block;                                                                                                               
+    font-size: 10px;                                                                                                              
+    color: #5fba3d;                                                                                                                
+    font-family: monospace, prestige;                                                                                              
+    background-color: #080808;                                                                                                    
+}

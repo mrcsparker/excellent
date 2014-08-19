@@ -1,0 +1,15 @@
+{
+  "name": "Excellent",
+  "version": "1.0.0",
+  "main": "index.html",
+  "window": {
+    "icon": "icon.png",
+    "toolbar": false,
+    "min_height": 480,
+    "min_width": 640,
+    "width": 1024,
+    "height": 768,
+    "position": "center",
+    "title": "Excellent Demo"
+  }
+}

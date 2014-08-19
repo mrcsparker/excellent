@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html ng-app>
+  <head>
+    <title>Excellent Demo</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <script src="scripts/jquery-2.0.3.min.js"></script>
+    <script src="../excellent.js"></script>
+    <script src="scripts/angular.js"></script>
+    <script src="scripts/demo.js"></script>
+    <script src="bs3/js/bootstrap.js"></script>
+
+    <link href="bs3/css/bootstrap.css" rel="stylesheet" />
+    <link href="demo.css" rel="stylesheet" />
+  </head>
+  <body ng-controller="DemoCtrl">
+    <div class="container">
+
+      <p>&nbsp;</p>
+
+      <div class="panel panel-primary">
+        <div class="panel-heading">
+          <h4>Upload an XLSX file</h4>
+        </div>
+
+        <div class="panel-body">
+
+          <form role="form">
+            <div class="form-group">
+              <input type="file" id="file" name="file" onchange="angular.element(this).scope().upload(this)" />
+            </div>
+
+            <div class="checkbox">
+              <label>
+                <input type="checkbox" ng-model="showFormula" /> Show formula
+              </label>
+            </div>
+
+            <div class="form-group" ng-show="Object.keys(workbook).length > 0">
+              <button class="btn btn-info" ng-click="saveFullWorkbook()">Save workbook</button>
+            </div>
+
+            <div class="form-group" ng-show="hasSavedFullWorkbook()">
+              <button class="btn btn-primary" ng-click="loadFullWorkbook()">Load saved workbook</button>
+            </div>
+
+          </form>
+        </div>
+
+      </div>
+
+      <ul class="nav nav-tabs" id="workbookTab">
+        <li ng-class="{active: $first}" ng-repeat="sheet in Object.keys(workbook)">
+          <a href="#{{sheet.split(' ').join('_')}}" data-toggle="tab">{{sheet}}</a>
+        </li>
+      </ul>
+
+      <div class="tab-content">
+        <div class="tab-pane" ng-class="{active: $first}"
+             id="{{sheet.split(' ').join('_')}}" ng-repeat="sheet in Object.keys(workbook)">
+          <table class="table table-condensed">
+            <thead>
+              <tr>
+                <th style="width: 1%">&nbsp;</th>
+                <th class="col-sm-1" ng-repeat="column in sheetColumns(workbook[sheet])">{{column}}</th>
+            </thead>
+            <tbody>
+              <tr ng-repeat="row in workbook[sheet].rows">
+                <td class="row-number">{{$index + 1}}</td>
+                <td ng-repeat="cell in row">
+                  <span ng-show="workbook[sheet].variables.indexOf(cell.index) > -1 && isNumber(cell.value)">
+                    <input type="text" size="5" ng-model="cell.value"
+                           ng-change="updateCell(workbook, sheet, cell)" value="{{cell.value}}" />
+                  </span>
+                  <span ng-show="workbook[sheet].variables.indexOf(cell.index) > -1 && !isNumber(cell.value)">
+                    {{cell.value}}
+                  </span>
+                  <span ng-hide="workbook[sheet].variables.indexOf(cell.index) > -1">
+                    {{workbook[sheet][cell.index]}}
+                    <span class="formula" ng-show="showFormula && cell.value && cell.value != ''">
+                      {{cell.value.split(',').join(", ")}}
+                    </span>
+                  </span>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+    </div>
+
+  </body>
+</html>
+
