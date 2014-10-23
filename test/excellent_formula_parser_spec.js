@@ -2,36 +2,36 @@ var assert = require('assert'),
   FormulaParser = require('../src/excellent.parser.js');
 
 describe('ExcellentFormulaParser', function() {
-  "use strict";
+  'use strict';
 
   describe('Atom', function() {
     it('should be able to parse a number', function() {
-      assert.equal(FormulaParser.parse("1"), 1);
-      assert.equal(FormulaParser.parse("100"), 100);
-      assert.equal(FormulaParser.parse("101"), 101);
-      assert.equal(FormulaParser.parse("201"), 201);
-      assert.equal(FormulaParser.parse("234"), 234);
+      assert.equal(FormulaParser.parse('1'), 1);
+      assert.equal(FormulaParser.parse('100'), 100);
+      assert.equal(FormulaParser.parse('101'), 101);
+      assert.equal(FormulaParser.parse('201'), 201);
+      assert.equal(FormulaParser.parse('234'), 234);
     });
 
     it('should be able to parse a floating point number', function() {
-      assert.equal(FormulaParser.parse("1.01"), 1.01);
-      assert.equal(FormulaParser.parse("12.01"), 12.01);
-      assert.equal(FormulaParser.parse("99.99"), 99.99);
+      assert.equal(FormulaParser.parse('1.01'), 1.01);
+      assert.equal(FormulaParser.parse('12.01'), 12.01);
+      assert.equal(FormulaParser.parse('99.99'), 99.99);
     });
 
     it('should be able to convert a percentage into a number', function() {
-      assert.equal(FormulaParser.parse("100%"), 1.00);
-      assert.equal(FormulaParser.parse("99%"), 0.99);
-      assert.equal(FormulaParser.parse("75%"), 0.75);
-      assert.equal(FormulaParser.parse("75%+25%"), "0.75+0.25");
-      assert.equal(FormulaParser.parse("100%+D4"), "1+this.D4");
+      assert.equal(FormulaParser.parse('100%'), 1.00);
+      assert.equal(FormulaParser.parse('99%'), 0.99);
+      assert.equal(FormulaParser.parse('75%'), 0.75);
+      assert.equal(FormulaParser.parse('75%+25%'), '0.75+0.25');
+      assert.equal(FormulaParser.parse('100%+D4'), '1+this.D4');
     });
 
     it('should be able to parse a simple paren expression', function() {
-      assert.equal(FormulaParser.parse("(1)"), "(1)");
-      assert.equal(FormulaParser.parse("(12)"), "(12)");
-      assert.equal(FormulaParser.parse("(123)"), "(123)");
-      assert.equal(FormulaParser.parse("(999)"), "(999)");
+      assert.equal(FormulaParser.parse('(1)'), '(1)');
+      assert.equal(FormulaParser.parse('(12)'), '(12)');
+      assert.equal(FormulaParser.parse('(123)'), '(123)');
+      assert.equal(FormulaParser.parse('(999)'), '(999)');
     });
 
     it('should be able to parse a double quoted string', function() {
@@ -92,7 +92,8 @@ describe('ExcellentFormulaParser', function() {
     });
 
     it('should be able to handle $ bill yall', function() {
-      var output = FormulaParser.parse("SUM($C3*D3,$C4*D4,$C5*D5,$C6*D6,$C7*D7,$C8*D8)")
+      var output = FormulaParser.parse('SUM($C3*D3,$C4*D4,$C5*D5,$C6*D6,$C7*D7,$C8*D8)');
+      assert.equal(output, 'Formula.SUM(this.$C3*this.D3,this.$C4*this.D4,this.$C5*this.D5,this.$C6*this.D6,this.$C7*this.D7,this.$C8*this.D8)');
     });
 
     it('should be able to handle a negative variable', function() {
@@ -123,8 +124,8 @@ describe('ExcellentFormulaParser', function() {
   describe('IF', function() {
     it('should handle simple IF', function() {
       assert.equal(FormulaParser.parse('IF(1, 2, 3)'), 'Formula.IF(1,2,3)');
-      assert.equal(FormulaParser.parse("IF(1=1, 2, 3)"), 'Formula.IF(1==1,2,3)');
-      assert.equal(FormulaParser.parse("IF(A1=1, 2, 3)"), 'Formula.IF(this.A1==1,2,3)');
+      assert.equal(FormulaParser.parse('IF(1=1, 2, 3)'), 'Formula.IF(1==1,2,3)');
+      assert.equal(FormulaParser.parse('IF(A1=1, 2, 3)'), 'Formula.IF(this.A1==1,2,3)');
       assert.equal(FormulaParser.parse("IF(A1='a', 2, 3)"), "Formula.IF(this.A1==\"a\",2,3)");
       assert.equal(FormulaParser.parse("IF(A1='', 2, 3)"), "Formula.IF(this.A1==\"\",2,3)");
     });
