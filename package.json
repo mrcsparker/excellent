@@ -25,7 +25,7 @@
     "underscore": ">=1.4.3",
     "xmldom": "*",
     "pegjs": "*",
-    "formulajs": "git://github.com/sutoiku/formula.js.git",
+    "formulajs": "1.0.5",
     "jszip": "git://github.com/Stuk/jszip.git"
   },
   "devDependencies": {

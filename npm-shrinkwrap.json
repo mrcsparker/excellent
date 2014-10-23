@@ -1,0 +1,91 @@
+{
+  "name": "excellent",
+  "version": "0.1.0",
+  "dependencies": {
+    "formulajs": {
+      "version": "1.0.5",
+      "from": "formulajs@1.0.5",
+      "resolved": "https://registry.npmjs.org/formulajs/-/formulajs-1.0.5.tgz",
+      "dependencies": {
+        "jStat": {
+          "version": "1.0.6",
+          "from": "jStat@1.0.6",
+          "resolved": "https://registry.npmjs.org/jStat/-/jStat-1.0.6.tgz",
+          "dependencies": {
+            "uglify-js": {
+              "version": "1.2.3",
+              "from": "uglify-js@1.2.3",
+              "resolved": "https://registry.npmjs.org/uglify-js/-/uglify-js-1.2.3.tgz"
+            },
+            "vows": {
+              "version": "0.7.0",
+              "from": "vows@>=0.7.0 <0.8.0",
+              "resolved": "https://registry.npmjs.org/vows/-/vows-0.7.0.tgz",
+              "dependencies": {
+                "eyes": {
+                  "version": "0.1.8",
+                  "from": "eyes@>=0.1.6",
+                  "resolved": "https://registry.npmjs.org/eyes/-/eyes-0.1.8.tgz"
+                },
+                "diff": {
+                  "version": "1.0.8",
+                  "from": "diff@>=1.0.3 <1.1.0",
+                  "resolved": "https://registry.npmjs.org/diff/-/diff-1.0.8.tgz"
+                }
+              }
+            }
+          }
+        },
+        "numeral": {
+          "version": "1.5.3",
+          "from": "numeral@1.5.3",
+          "resolved": "https://registry.npmjs.org/numeral/-/numeral-1.5.3.tgz"
+        },
+        "numeric": {
+          "version": "1.2.6",
+          "from": "numeric@1.2.6",
+          "resolved": "https://registry.npmjs.org/numeric/-/numeric-1.2.6.tgz"
+        },
+        "bessel": {
+          "version": "0.2.0",
+          "from": "bessel@0.2.0",
+          "resolved": "https://registry.npmjs.org/bessel/-/bessel-0.2.0.tgz",
+          "dependencies": {
+            "voc": {
+              "version": "0.5.0",
+              "from": "voc@*",
+              "resolved": "https://registry.npmjs.org/voc/-/voc-0.5.0.tgz"
+            }
+          }
+        }
+      }
+    },
+    "jszip": {
+      "version": "2.4.0",
+      "from": "jszip@git://github.com/Stuk/jszip.git",
+      "resolved": "git://github.com/Stuk/jszip.git#bf7ec8c84bc3c6f486eb576c850dbed562e983a0",
+      "dependencies": {
+        "pako": {
+          "version": "0.2.5",
+          "from": "pako@>=0.2.5 <0.3.0",
+          "resolved": "https://registry.npmjs.org/pako/-/pako-0.2.5.tgz"
+        }
+      }
+    },
+    "pegjs": {
+      "version": "0.8.0",
+      "from": "pegjs@*",
+      "resolved": "https://registry.npmjs.org/pegjs/-/pegjs-0.8.0.tgz"
+    },
+    "underscore": {
+      "version": "1.7.0",
+      "from": "underscore@>=1.4.3",
+      "resolved": "https://registry.npmjs.org/underscore/-/underscore-1.7.0.tgz"
+    },
+    "xmldom": {
+      "version": "0.1.19",
+      "from": "xmldom@*",
+      "resolved": "https://registry.npmjs.org/xmldom/-/xmldom-0.1.19.tgz"
+    }
+  }
+}
