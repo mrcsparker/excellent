@@ -1,8 +1,8 @@
 var Excellent = Excellent || {};
 
 if (typeof exports !== 'undefined') {
-  var Excellent = require('./excellent.util.js').Excellent,
-    Formula = require('formulajs');
+  var Excellent = require('./excellent.util.js').Excellent;
+  var Formula = require('formulajs');
 }
 
 var Formula = Formula || {};
@@ -10,7 +10,8 @@ var Formula = Formula || {};
 Formula.VLOOKUP = function(needle, index, exactmatch) {
   'use strict';
 
-  var i, row;
+  var i;
+  var row;
 
   index = index || 0;
   exactmatch = exactmatch || false;
@@ -27,7 +28,8 @@ Formula.VLOOKUP = function(needle, index, exactmatch) {
 Formula.MATCH = function(needle, searchArray, exactmatch) {
   'use strict';
 
-  var i, item;
+  var i;
+  var item;
 
   exactmatch = exactmatch || false;
   for (i = 0; i < searchArray.length; i += 1) {
@@ -163,7 +165,8 @@ Excellent.Workbook = function() {
   };
 
   self.zeroOutNullRows = function() {
-    var sheet, cell;
+    var sheet;
+    var cell;
 
     for (sheet in self.workbook) {
       if (self.workbook.hasOwnProperty(sheet)) {

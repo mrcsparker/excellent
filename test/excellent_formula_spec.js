@@ -1,10 +1,10 @@
-var assert = require('assert'),
-  fs = require('fs-extra'),
-  Excellent = require('../src').Excellent,
-  Formula = require('formulajs');
+var assert = require('assert');
+var fs = require('fs-extra');
+var Excellent = require('../src').Excellent;
+var Formula = require('formulajs');
 
 describe('ExcellentFormula', function() {
-  "use strict";
+  'use strict';
 
   it('should be able to evaluate simple formulas from formula.js', function() {
     assert.equal(Formula.SUM(1, 2), 3);
@@ -13,7 +13,10 @@ describe('ExcellentFormula', function() {
 
   describe('Simple Formulas: basic tests of Formula / Excellent integration', function() {
 
-    var xlsxFile, excellent, parsed, content;
+    var xlsxFile;
+    var excellent;
+    var parsed;
+    var content;
 
     xlsxFile = fs.readFileSync('./test/data/simpleFormula.xlsx', 'binary');
     excellent = new Excellent.Xlsx();
@@ -67,7 +70,10 @@ describe('ExcellentFormula', function() {
   });
 
   describe('Simple ranges', function() {
-    var xlsxFile, excellent, parsed, content;
+    var xlsxFile;
+    var excellent;
+    var parsed;
+    var content;
 
     xlsxFile = fs.readFileSync('./test/data/simpleRange.xlsx', 'binary');
     excellent = new Excellent.Xlsx();

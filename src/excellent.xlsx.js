@@ -1,9 +1,9 @@
 var Excellent = Excellent || {};
 
 if (typeof exports !== 'undefined') {
-  var Excellent = require('./excellent.workbook.js').Excellent,
-    JSZip = require('jszip'),
-    FormulaParser = require('./excellent.parser.js');
+  var Excellent = require('./excellent.workbook.js').Excellent;
+  var JSZip = require('jszip');
+  var FormulaParser = require('./excellent.parser.js');
 }
 
 if (typeof DOMParser === 'undefined') {
@@ -26,7 +26,9 @@ Array.prototype.contains = function(v) {
 Array.prototype.unique = function() {
   'use strict';
 
-  var i, arr = [];
+  var i;
+  var arr = [];
+
   for (i = 0; i < this.length; i += 1) {
     if (!arr.contains(this[i])) {
       arr.push(this[i]);
@@ -38,8 +40,8 @@ Array.prototype.unique = function() {
 Excellent.Xlsx = function() {
   'use strict';
 
-  var self = {},
-    workbook = new Excellent.Workbook();
+  var self = {};
+  var workbook = new Excellent.Workbook();
 
   var XlsxStrings = (function() {
     var stringList = [];
@@ -58,7 +60,10 @@ Excellent.Xlsx = function() {
     }
 
     function populateList(xmlString) {
-      var xml, json, tmpList, si;
+      var xml;
+      var json;
+      var tmpList;
+      var si;
 
       xml = new DOMParser().parseFromString(xmlString, 'text/xml');
       json = Excellent.Util.xmlToJson(xml);
@@ -88,10 +93,10 @@ Excellent.Xlsx = function() {
   }());
 
   function XlsxSheet(xmlString) {
-    var self = {},
-      sheetData,
-      xml,
-      json;
+    var self = {};
+    var sheetData;
+    var xml;
+    var json;
 
     xml = new DOMParser().parseFromString(xmlString, 'text/xml');
 
@@ -200,7 +205,6 @@ Excellent.Xlsx = function() {
         matchSkipStart,
         matchSkipEnd;
 
-
       for (curRow = 1; curRow <= totalRows; curRow += 1) {
 
         for (curCol = 0; curCol < totalCols; curCol += 1) {
@@ -263,9 +267,9 @@ Excellent.Xlsx = function() {
     // This code is pretty ugly.  Going to clean it up as soon as
     // I get the various Excel types worked out.
     function buildColumn(c) {
-      var columnId,
-        columnValue,
-        columnType;
+      var columnId;
+      var columnValue;
+      var columnType;
 
       if (c === undefined) {
         return;
@@ -316,27 +320,32 @@ Excellent.Xlsx = function() {
   }
 
   function XlsxWorkbook(xmlString, zipLib) {
-    var self = {},
-
-      xml,
-      zip,
-      json;
+    var self = {};
+    var xml;
+    var zip;
+    var json;
 
     xml = new DOMParser().parseFromString(xmlString, 'text/xml');
     zip = zipLib;
     json = Excellent.Util.xmlToJson(xml).workbook;
 
     function buildFileVersion() {
-      var attrs, fileVersion;
+      var attrs;
+      var fileVersion;
 
       attrs = json.fileVersion['@'];
-      fileVersion = attrs.lastEdited + '.' + attrs.lowestEdited + '.' + attrs.rupBuild;
+      fileVersion =
+        attrs.lastEdited + '.' +
+        attrs.lowestEdited + '.' +
+        attrs.rupBuild;
 
       workbook.setType(attrs.appName).setFileVersion(fileVersion);
     }
 
     function buildSheet(s) {
-      var sheetId, sheetName, xlsxSheet;
+      var sheetId;
+      var sheetName;
+      var xlsxSheet;
 
       sheetId = s['r:id'].replace('rId', '');
 
@@ -372,8 +381,12 @@ Excellent.Xlsx = function() {
   }
 
   self.load = function(xlsxFile) {
+
     function extractFiles(zipFile) {
-      var zip, stringZip, xlsxWorkbook;
+      var zip;
+      var stringZip;
+      var zipWorkbook;
+      var xlsxWorkbook;
 
       zip = new JSZip(zipFile);
 
@@ -382,7 +395,8 @@ Excellent.Xlsx = function() {
         XlsxStrings.set(stringZip.asText());
       }
 
-      xlsxWorkbook = new XlsxWorkbook(zip.file('xl/workbook.xml').asText(), zip);
+      zipWorkbook = zip.file('xl/workbook.xml').asText();
+      xlsxWorkbook = new XlsxWorkbook(zipWorkbook, zip);
       xlsxWorkbook.load();
 
       return workbook;
