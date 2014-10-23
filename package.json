@@ -22,11 +22,12 @@
     "url": "git@github.com:mrcsparker/excellent.git"
   },
   "dependencies": {
-    "underscore": ">=1.4.3",
-    "xmldom": "*",
-    "pegjs": "*",
     "formulajs": "1.0.5",
-    "jszip": "git://github.com/Stuk/jszip.git"
+    "jszip": "git://github.com/Stuk/jszip.git",
+    "pegjs": "*",
+    "traceur": "0.0.72",
+    "underscore": ">=1.4.3",
+    "xmldom": "*"
   },
   "devDependencies": {
     "browserify": "*",
@@ -35,6 +36,7 @@
     "gulp-jscs": "^1.2.1",
     "gulp-jshint": "^1.8.5",
     "gulp-mocha": "^1.1.1",
+    "gulp-traceur": "^0.13.0",
     "gulp-util": "^3.0.1",
     "jshint-stylish": "^1.0.0",
     "mocha": "^2.0.1",
