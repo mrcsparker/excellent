@@ -1,103 +1,194 @@
 /**
  * Excel formula parser for Excellent
  *
- * Translates Excel formulas into javascript
- * data structures that Excellent can evaluate
+ * Parses Excel formulas into AST structures
+ * that Excellent can evaluate without using eval.
  */
 
 {
-// From https://github.com/joshatjben/excelFormulaUtilitiesJS
-// Modified for Excellent
+function literal(value) {
+  return {
+    type: 'Literal',
+    value: value
+  };
+}
 
-// This was Modified from a function at http://en.wikipedia.org/wiki/Hexavigesimal
-// Pass in the base 26 string, get back integer
-var fromBase26 = function (number) {
+function errorLiteral(code) {
+  return {
+    type: 'ErrorLiteral',
+    code: code
+  };
+}
 
-    "use strict";
+function cellReference(ref, sheet) {
+  return {
+    type: 'CellReference',
+    ref: ref,
+    sheet: sheet || null
+  };
+}
 
-    number = number.toUpperCase();
+function binaryExpression(left, operator, right) {
+  return {
+    type: 'BinaryExpression',
+    left: left,
+    operator: operator,
+    right: right
+  };
+}
 
-    var s = 0, i, dec = 0;
+function unaryExpression(operator, argument) {
+  return {
+    type: 'UnaryExpression',
+    operator: operator,
+    argument: argument
+  };
+}
 
-    if (number !== null && typeof number !== "undefined" && number.length > 0) {
-        for (i = 0; i < number.length; i += 1) {
-            s = number.charCodeAt(number.length - i - 1) - "A".charCodeAt(0);
-            dec += (Math.pow(26, i)) * (s + 1);
-        }
+function arrayExpression(elements) {
+  return {
+    type: 'ArrayExpression',
+    elements: elements
+  };
+}
+
+function formulaCallExpression(name, args) {
+  return {
+    type: 'FormulaCallExpression',
+    name: name,
+    arguments: args
+  };
+}
+
+function foldBinary(head, tail) {
+  var result = head;
+  var i;
+
+  for (i = 0; i < tail.length; i += 1) {
+    result = binaryExpression(result, tail[i][1], tail[i][3]);
+  }
+
+  return result;
+}
+
+function fromBase26(number) {
+  "use strict";
+
+  number = number.toUpperCase();
+
+  var s = 0;
+  var i;
+  var dec = 0;
+
+  if (number !== null && typeof number !== "undefined" && number.length > 0) {
+    for (i = 0; i < number.length; i += 1) {
+      s = number.charCodeAt(number.length - i - 1) - "A".charCodeAt(0);
+      dec += (Math.pow(26, i)) * (s + 1);
+    }
+  }
+
+  return dec - 1;
+}
+
+function toBase26(value) {
+  "use strict";
+
+  value = Math.abs(value);
+
+  var converted = "";
+  var iteration = false;
+  var remainder;
+
+  do {
+    remainder = value % 26;
+
+    if (iteration && value < 25) {
+      remainder -= 1;
     }
 
-    return dec - 1;
-};
+    converted = String.fromCharCode((remainder + "A".charCodeAt(0))) + converted;
+    value = Math.floor((value - remainder) / 26);
+    iteration = true;
+  } while (value > 0);
 
-var toBase26 = function (value) {
+  return converted;
+}
 
-    "use strict";
+function buildRange(start, end) {
+  var startRow = parseInt(start.match(/[0-9]+/gi)[0], 10);
+  var startCol = start.match(/[A-Z]+/gi)[0];
+  var startColDec = fromBase26(startCol);
+  var endRow = parseInt(end.match(/[0-9]+/gi)[0], 10);
+  var endCol = end.match(/[A-Z]+/gi)[0];
+  var totalRows = endRow - startRow + 1;
+  var totalCols = fromBase26(endCol) - fromBase26(startCol) + 1;
+  var curCol = 0;
+  var curRow = 1;
+  var cells = [];
+  var curCell = "";
 
-    value = Math.abs(value);
+  for (; curRow <= totalRows; curRow += 1) {
+    for (; curCol < totalCols; curCol += 1) {
+      curCell = toBase26(startColDec + curCol) + "" + (startRow + curRow - 1);
+      cells.push(cellReference(curCell));
+    }
+    curCol = 0;
+  }
 
-    var converted = "", iteration = false, remainder;
-
-    // Repeatedly divide the number by 26 and convert the
-    // remainder into the appropriate letter.
-    do {
-        remainder = value % 26;
-
-        // Compensate for the last letter of the series being corrected on 2 or more iterations.
-        if (iteration && value < 25) {
-            remainder -= 1;
-        }
-
-        converted = String.fromCharCode((remainder + 'A'.charCodeAt(0))) + converted;
-        value = Math.floor((value - remainder) / 26);
-
-        iteration = true;
-    } while (value > 0);
-
-    return converted;
-};
+  return arrayExpression(cells);
+}
 }
 
 start
   = Expression
 
 Expression
-  = ArithmeticExpression
+  = ComparisonExpression
 
-ArithmeticOperator
-  = "*"
-  / "/"
-  / "+"
-  / "-"
-  / "^"
-  / "="
-  / "&"
-  / "<"
-  / ">"
+ComparisonExpression
+  = head:ConcatenationExpression
+    tail:(__ operator:("=" / "<" / ">") __ right:ConcatenationExpression)* {
+      var normalizedTail = tail.map(function(entry) {
+        return [entry[0], entry[1] === "=" ? "==" : entry[1], entry[2], entry[3]];
+      });
 
-ArithmeticExpression
-  = head:Atom
-    tail:(__ ArithmeticOperator __ Atom)* {
-      var result = [head],
-        oper;
+      return foldBinary(head, normalizedTail);
+    }
 
-      for (var i = 0; i < tail.length; i += 1) {
-        oper = tail[i][1];
+ConcatenationExpression
+  = head:AdditiveExpression
+    tail:(__ operator:"&" __ right:AdditiveExpression)* {
+      return foldBinary(head, tail);
+    }
 
-        oper = oper.replace('=', '==');
-        oper = oper.replace('&', '+""+');
+AdditiveExpression
+  = head:MultiplicativeExpression
+    tail:(__ operator:("+" / "-") __ right:MultiplicativeExpression)* {
+      return foldBinary(head, tail);
+    }
 
-        result.push(oper);
-        result.push(tail[i][3]);
-      }
+MultiplicativeExpression
+  = head:PowerExpression
+    tail:(__ operator:("*" / "/") __ right:PowerExpression)* {
+      return foldBinary(head, tail);
+    }
 
-      return result.join("");
-  }
+PowerExpression
+  = head:UnaryExpression
+    tail:(__ operator:"^" __ right:UnaryExpression)* {
+      return foldBinary(head, tail);
+    }
 
-// Atoms self-evalute.
-// This is the simplest expression form
-Atom
+UnaryExpression
+  = operator:("+" / "-") __ argument:UnaryExpression {
+      return unaryExpression(operator, argument);
+    }
+  / Primary
+
+Primary
   = ParenExpression
   / Number
+  / ErrorLiteral
   / Range
   / FunctionCall
   / Variable
@@ -105,90 +196,81 @@ Atom
 
 // (A1 + B1) + C1
 ParenExpression
-  = "(" expression:Expression ")" {
-      return "(" + expression + ")";
+  = "(" __ expression:Expression __ ")" {
+      return expression;
     }
 
 Number
   // Percentages
   = digits:([0-9]+ "%") {
-      console.log(parseFloat(digits.join("").replace(/,/g, "").replace(/%/g, ""), 10));
-      return parseFloat(digits.join("").replace(/,/g, "").replace(/%/g, ""), 10) / 100.0;
+      return literal(parseFloat(digits.join("").replace(/,/g, "").replace(/%/g, ""), 10) / 100.0);
     }
     // Regular floating-point numbers
     /
-    digits:("-"? [0-9]+ ("." [0-9]+)? ("e"[0-9]+)?) {
-      return parseFloat(digits.join("").replace(/,/g,""), 10);
+    digits:([0-9]+ ("." [0-9]+)? (("e" / "E") ("+" / "-")? [0-9]+)?) {
+      return literal(parseFloat(digits.join("").replace(/,/g,""), 10));
     }
 
 String
-  = '"' str:[^'"\n]+ '"' {
-      return '"' + str.join("") + '"';
+  = '"' str:DoubleQuotedCharacter* '"' {
+      return literal(str.join(""));
     }
-  / "'" str:[^'"\n]+ "'" {
-      return '"' + str.join("") + '"';
+  / "'" str:SingleQuotedCharacter* "'" {
+      return literal(str.join(""));
     }
-  / "''" {
-    return '""';
-  }
-  / '""' {
-    return '""';
-  }
+
+DoubleQuotedCharacter
+  = '""' {
+      return '"';
+    }
+  / char:[^"\n] {
+      return char;
+    }
+
+SingleQuotedCharacter
+  = "''" {
+      return "'";
+    }
+  / char:[^'\n] {
+      return char;
+    }
+
+ErrorLiteral
+  = "#DIV/0!" {
+      return errorLiteral('#DIV/0!');
+    }
+  / "#VALUE!" {
+      return errorLiteral('#VALUE!');
+    }
+  / "#REF!" {
+      return errorLiteral('#REF!');
+    }
+  / "#NAME?" {
+      return errorLiteral('#NAME?');
+    }
+  / "#N/A" {
+      return errorLiteral('#N/A');
+    }
 
 FunctionCall
-  = __ name:Identifier __ arguments:(Arguments) {
-    return "Formula." + name + arguments;
+  = __ name:Identifier __ args:(Arguments) {
+    return formulaCallExpression(name, args);
   }
 
 Range
   = start:Identifier __ ":" __ end:Identifier {
-
-    // Taken from https://github.com/joshatjben/excelFormulaUtilitiesJS
-    // and modified for Excellent
-
-    var startRow = parseInt(start.match(/[0-9]+/gi)[0]),
-        startCol = start.match(/[A-Z]+/gi)[0],
-        startColDec = fromBase26(startCol),
-
-        endRow = parseInt(end.match(/[0-9]+/gi)[0]),
-        endCol = end.match(/[A-Z]+/gi)[0],
-        endColDec = fromBase26(endCol),
-
-        // Total rows and cols
-        totalRows = endRow - startRow + 1,
-        totalCols = fromBase26(endCol) - fromBase26(startCol) + 1,
-
-        // Loop vars
-        curCol = 0,
-        curRow = 1,
-        curCell = "",
-        retVal = [];
-
-        for (; curRow <= totalRows; curRow += 1) {
-            for (; curCol < totalCols; curCol += 1) {
-                // Get the current cell id
-                curCell = toBase26(startColDec + curCol) + "" + (startRow+curRow-1) ;
-                retVal.push("this." + curCell);
-            }
-            curCol = 0;
-        }
-
-    return "[" + retVal.join(",") + "]";
+    return buildRange(start, end);
 }
 
 Arguments
-  = "(" __ arguments:ArgumentList? __ ")" {
-    if (arguments.length > 0) {
-      return "(" + arguments.join(",") + ")";
-    } else {
-      return "()";
-    }
+  = "(" __ args:ArgumentList? __ ")" {
+    return args || [];
   }
 
 ArgumentList
   = head:Expression tail:(__ "," __ Expression)* {
     var result = [head];
-    for (var i = 0; i < tail.length; i++) {
+    for (var i = 0; i < tail.length; i += 1) {
       result.push(tail[i][3]);
     }
     return result;
@@ -196,16 +278,13 @@ ArgumentList
 
 Variable
   = "'" workbook:AlphaNumeric "'!" name:IdentifierVariable {
-    return "self.workbook['" + workbook.join("") + "']." + name;
+    return cellReference(name, workbook.join(""));
   }
   / workbook:Identifier "!" name:IdentifierVariable {
-      return "self.workbook['" + workbook + "']." + name;
-    }
-  / "-" name:IdentifierVariable {
-      return "-this." + name;
+      return cellReference(name, workbook);
     }
   / name:IdentifierVariable {
-      return "this." + name;
+      return cellReference(name);
     }
 
 IdentifierVariable
@@ -233,7 +312,7 @@ IdentifierPart
   / Digit
 
 AlphaNumeric
-  = ('&' / '-' / '_' / ' ' / [a-z] / [A-Z])*
+  = ('&' / '-' / '_' / ' ' / [a-z] / [A-Z] / [0-9])*
 
 Alpha
   = [a-zA-Z]
@@ -248,4 +327,3 @@ __
 
 WhiteSpace "whitespace"
   = [ \t\r\n]
-

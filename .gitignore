@@ -1,5 +1,9 @@
+.DS_Store
+.playwright-cli
 .idea
+coverage
+generated
 node_modules
 tmp
-bower_components
 dist
+*.tgz

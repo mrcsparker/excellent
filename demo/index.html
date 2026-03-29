@@ -1,95 +1,207 @@
 <!DOCTYPE html>
-<html ng-app>
+<html lang="en">
   <head>
-    <title>Excellent Demo</title>
+    <meta charset="UTF-8">
+    <title>Excellent Workbook Studio</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta
+      name="description"
+      content="A browser-local demo for loading XLSX workbooks, inspecting formulas, editing inputs, and tracing spreadsheet dependencies."
+    >
+    <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='9' fill='%230c0f13'/%3E%3Cpath d='M8 9h16v3H12v4h10v3H12v4h12v3H8z' fill='%23f6ca67'/%3E%3C/svg%3E">
 
-    <script src="scripts/jquery-2.0.3.min.js"></script>
-    <script src="../excellent.js"></script>
-    <script src="scripts/angular.js"></script>
-    <script src="scripts/demo.js"></script>
-    <script src="bs3/js/bootstrap.js"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 
-    <link href="bs3/css/bootstrap.css" rel="stylesheet" />
-    <link href="demo.css" rel="stylesheet" />
+    <link href="demo.css" rel="stylesheet">
+    <script src="../dist/excellent.js"></script>
+    <script src="scripts/demo.js" defer></script>
   </head>
-  <body ng-controller="DemoCtrl">
-    <div class="container">
-
-      <p>&nbsp;</p>
-
-      <div class="panel panel-primary">
-        <div class="panel-heading">
-          <h4>Upload an XLSX file</h4>
-        </div>
-
-        <div class="panel-body">
-
-          <form role="form">
-            <div class="form-group">
-              <input type="file" id="file" name="file" onchange="angular.element(this).scope().upload(this)" />
-            </div>
-
-            <div class="checkbox">
-              <label>
-                <input type="checkbox" ng-model="showFormula" /> Show formula
-              </label>
-            </div>
-
-            <div class="form-group" ng-show="Object.keys(workbook).length > 0">
-              <button class="btn btn-info" ng-click="saveFullWorkbook()">Save workbook</button>
-            </div>
-
-            <div class="form-group" ng-show="hasSavedFullWorkbook()">
-              <button class="btn btn-primary" ng-click="loadFullWorkbook()">Load saved workbook</button>
-            </div>
-
-          </form>
-        </div>
-
-      </div>
-
-      <ul class="nav nav-tabs" id="workbookTab">
-        <li ng-class="{active: $first}" ng-repeat="sheet in Object.keys(workbook)">
-          <a href="#{{sheet.split(' ').join('_')}}" data-toggle="tab">{{sheet}}</a>
-        </li>
-      </ul>
-
-      <div class="tab-content">
-        <div class="tab-pane" ng-class="{active: $first}"
-             id="{{sheet.split(' ').join('_')}}" ng-repeat="sheet in Object.keys(workbook)">
-          <table class="table table-condensed">
-            <thead>
-              <tr>
-                <th style="width: 1%">&nbsp;</th>
-                <th class="col-sm-1" ng-repeat="column in sheetColumns(workbook[sheet])">{{column}}</th>
-            </thead>
-            <tbody>
-              <tr ng-repeat="row in workbook[sheet].rows">
-                <td class="row-number">{{$index + 1}}</td>
-                <td ng-repeat="cell in row">
-                  <span ng-show="workbook[sheet].variables.indexOf(cell.index) > -1 && isNumber(cell.value)">
-                    <input type="text" size="5" ng-model="cell.value"
-                           ng-change="updateCell(workbook, sheet, cell)" value="{{cell.value}}" />
-                  </span>
-                  <span ng-show="workbook[sheet].variables.indexOf(cell.index) > -1 && !isNumber(cell.value)">
-                    {{cell.value}}
-                  </span>
-                  <span ng-hide="workbook[sheet].variables.indexOf(cell.index) > -1">
-                    {{workbook[sheet][cell.index]}}
-                    <span class="formula" ng-show="showFormula && cell.value && cell.value != ''">
-                      {{cell.value.split(',').join(", ")}}
-                    </span>
-                  </span>
-                </td>
-              </tr>
-            </tbody>
-          </table>
-        </div>
-      </div>
-
+  <body data-demo-state="booting">
+    <div class="demo-background" aria-hidden="true">
+      <div class="demo-orb demo-orb-a"></div>
+      <div class="demo-orb demo-orb-b"></div>
+      <div class="demo-grid"></div>
+      <div class="demo-vignette"></div>
+      <div class="demo-noise"></div>
     </div>
 
+    <div class="demo-shell">
+      <header class="topbar reveal reveal-delay-1">
+        <div class="brand-lockup">
+          <div class="brand-mark" aria-hidden="true">
+            <span></span>
+            <span></span>
+            <span></span>
+            <span></span>
+          </div>
+          <div>
+            <div class="eyebrow">Excellent</div>
+            <h1>Workbook Studio</h1>
+          </div>
+        </div>
+
+        <div class="mode-strip" aria-label="Studio modes">
+          <span class="mode-pill mode-pill--active">Workbench</span>
+          <span class="mode-pill">Inspector</span>
+          <span class="mode-pill">Trace</span>
+        </div>
+
+        <div class="status-pill" id="status-pill" aria-live="polite"></div>
+      </header>
+
+      <div class="signal-ribbon reveal reveal-delay-2" aria-label="Studio capabilities">
+        <span>Browser-local parse</span>
+        <span>Formula trace</span>
+        <span>Dependency graph</span>
+        <span>Snapshot restore</span>
+        <span>No server round-trip</span>
+      </div>
+
+      <main class="app-shell">
+        <section class="hero reveal reveal-delay-3">
+          <div class="hero-copy">
+            <div class="eyebrow">Modern XLSX runtime demo</div>
+            <h2>Load a workbook, edit the inputs, and inspect exactly how the engine resolves every computed cell.</h2>
+            <p>
+              This surface runs fully in the browser. Use a built-in fixture or your own <code>.xlsx</code> file,
+              then move through sheets, inspect dependencies, and read the formula trace without the old framework shell.
+            </p>
+
+            <div class="hero-actions">
+              <button class="hero-button" type="button" id="load-starter-workbook">Load Starter Workbook</button>
+              <label class="hero-button hero-button--ghost" for="file-input">Open Your Own XLSX</label>
+            </div>
+          </div>
+
+          <aside class="control-panel" aria-label="Workbook controls">
+            <section class="panel-section">
+              <div class="panel-label">Quick Load</div>
+              <div class="sample-list" id="sample-list"></div>
+              <p class="panel-note">
+                Fixture buttons fetch local workbooks from this repo. Upload always works, even if you skip the samples.
+              </p>
+            </section>
+
+            <section class="panel-section panel-section--compact">
+              <div class="toggle-row">
+                <label class="switch" for="show-formulas">
+                  <input type="checkbox" id="show-formulas">
+                  <span class="switch-track"><span class="switch-thumb"></span></span>
+                  <span class="switch-copy">
+                    <strong>Reveal formula source</strong>
+                    <span>Show compiled formula text inline in the grid and inspector.</span>
+                  </span>
+                </label>
+              </div>
+
+              <div class="action-row">
+                <button class="secondary-button" type="button" id="save-snapshot">Save Snapshot</button>
+                <button class="secondary-button secondary-button--muted" type="button" id="restore-snapshot">Restore Snapshot</button>
+              </div>
+            </section>
+
+            <section class="panel-section">
+              <dl class="status-grid">
+                <div>
+                  <dt>Workbook</dt>
+                  <dd id="workbook-label">Awaiting workbook</dd>
+                </div>
+                <div>
+                  <dt>Source</dt>
+                  <dd id="source-label">No workbook loaded yet</dd>
+                </div>
+                <div>
+                  <dt>Parse Time</dt>
+                  <dd id="duration-label">No parse run yet</dd>
+                </div>
+                <div>
+                  <dt>Snapshot</dt>
+                  <dd id="snapshot-label">No snapshot saved</dd>
+                </div>
+              </dl>
+            </section>
+          </aside>
+        </section>
+
+        <section class="workspace reveal reveal-delay-4">
+          <div class="workspace-header">
+            <div>
+              <div class="eyebrow">Workbook Surface</div>
+              <h3 id="workspace-title">Ready for workbook</h3>
+              <p id="workspace-description">
+                Load a fixture or upload a workbook to render sheets, adjust inputs, and inspect formula behavior.
+              </p>
+            </div>
+
+            <div class="metric-strip" id="metric-strip" aria-label="Workbook metrics"></div>
+          </div>
+
+          <div class="sheet-tabs" id="sheet-tabs" hidden></div>
+
+          <div class="workspace-body">
+            <section class="grid-panel">
+              <div class="grid-toolbar">
+                <div class="grid-toolbar__summary">
+                  <span class="panel-label">Selected</span>
+                  <strong id="selected-cell-label">No cell selected</strong>
+                  <span id="selected-cell-subtitle">Choose a populated cell to inspect its inputs, outputs, and trace.</span>
+                </div>
+
+                <div class="grid-toolbar__note" id="grid-toolbar-note">
+                  Computed cells update immediately when editable inputs change.
+                </div>
+              </div>
+
+              <div class="empty-state" id="empty-state">
+                <div class="empty-state__copy">
+                  <div class="panel-label">Ready When You Are</div>
+                  <h4>Open a workbook to bring the studio to life.</h4>
+                  <p>
+                    The grid will render sheet tabs, editable inputs, formula output, dependency links, and a trace
+                    panel for the selected cell.
+                  </p>
+                </div>
+              </div>
+
+              <div class="sheet-frame" id="sheet-frame" hidden>
+                <div class="sheet-scroll">
+                  <table class="sheet-grid">
+                    <thead id="sheet-grid-head"></thead>
+                    <tbody id="sheet-grid-body"></tbody>
+                  </table>
+                </div>
+              </div>
+            </section>
+
+            <aside class="inspector-panel">
+              <section class="inspector-section">
+                <div class="panel-label">Cell Summary</div>
+                <div id="inspector-summary" class="inspector-stack"></div>
+              </section>
+
+              <section class="inspector-section">
+                <div class="panel-label">Dependencies</div>
+                <div id="dependency-panel" class="inspector-stack"></div>
+              </section>
+
+              <section class="inspector-section">
+                <div class="panel-label">Trace</div>
+                <div id="trace-panel" class="inspector-stack"></div>
+              </section>
+            </aside>
+          </div>
+        </section>
+      </main>
+    </div>
+
+    <input
+      type="file"
+      id="file-input"
+      name="file-input"
+      accept=".xlsx,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+      hidden
+    >
   </body>
 </html>
-

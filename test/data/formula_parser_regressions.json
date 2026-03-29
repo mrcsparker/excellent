@@ -1,0 +1,354 @@
+{
+  "valid": [
+    {
+      "label": "simple sum call",
+      "formula": "SUM(A1,A2)",
+      "ast": {
+        "type": "FormulaCallExpression",
+        "name": "SUM",
+        "arguments": [
+          {
+            "type": "CellReference",
+            "ref": "A1",
+            "sheet": null
+          },
+          {
+            "type": "CellReference",
+            "ref": "A2",
+            "sheet": null
+          }
+        ]
+      },
+      "debug": "Formula.SUM(this.A1,this.A2)"
+    },
+    {
+      "label": "cross-sheet reference",
+      "formula": "Sheet2!A1+1",
+      "ast": {
+        "type": "BinaryExpression",
+        "left": {
+          "type": "CellReference",
+          "ref": "A1",
+          "sheet": "Sheet2"
+        },
+        "operator": "+",
+        "right": {
+          "type": "Literal",
+          "value": 1
+        }
+      },
+      "debug": "self.workbook['Sheet2'].A1+1"
+    },
+    {
+      "label": "quoted worksheet reference",
+      "formula": "'Budget 2026'!B2+1",
+      "ast": {
+        "type": "BinaryExpression",
+        "left": {
+          "type": "CellReference",
+          "ref": "B2",
+          "sheet": "Budget 2026"
+        },
+        "operator": "+",
+        "right": {
+          "type": "Literal",
+          "value": 1
+        }
+      },
+      "debug": "self.workbook['Budget 2026'].B2+1"
+    },
+    {
+      "label": "absolute reference stays explicit in parse output",
+      "formula": "SUM($A$1,A2)",
+      "ast": {
+        "type": "FormulaCallExpression",
+        "name": "SUM",
+        "arguments": [
+          {
+            "type": "CellReference",
+            "ref": "$A$1",
+            "sheet": null
+          },
+          {
+            "type": "CellReference",
+            "ref": "A2",
+            "sheet": null
+          }
+        ]
+      },
+      "debug": "Formula.SUM(this.$A$1,this.A2)"
+    },
+    {
+      "label": "escaped double quotes",
+      "formula": "IF(\"He said \"\"hi\"\"\"=\"He said \"\"hi\"\"\",1,0)",
+      "ast": {
+        "type": "FormulaCallExpression",
+        "name": "IF",
+        "arguments": [
+          {
+            "type": "BinaryExpression",
+            "left": {
+              "type": "Literal",
+              "value": "He said \"hi\""
+            },
+            "operator": "==",
+            "right": {
+              "type": "Literal",
+              "value": "He said \"hi\""
+            }
+          },
+          {
+            "type": "Literal",
+            "value": 1
+          },
+          {
+            "type": "Literal",
+            "value": 0
+          }
+        ]
+      },
+      "debug": "Formula.IF(\"He said \\\"hi\\\"\"==\"He said \\\"hi\\\"\",1,0)"
+    },
+    {
+      "label": "error literal in IFERROR",
+      "formula": "IFERROR(#DIV/0!,99)",
+      "ast": {
+        "type": "FormulaCallExpression",
+        "name": "IFERROR",
+        "arguments": [
+          {
+            "type": "ErrorLiteral",
+            "code": "#DIV/0!"
+          },
+          {
+            "type": "Literal",
+            "value": 99
+          }
+        ]
+      },
+      "debug": "Formula.IFERROR(#DIV/0!,99)"
+    },
+    {
+      "label": "error literal in IFNA",
+      "formula": "IFNA(#N/A,77)",
+      "ast": {
+        "type": "FormulaCallExpression",
+        "name": "IFNA",
+        "arguments": [
+          {
+            "type": "ErrorLiteral",
+            "code": "#N/A"
+          },
+          {
+            "type": "Literal",
+            "value": 77
+          }
+        ]
+      },
+      "debug": "Formula.IFNA(#N/A,77)"
+    },
+    {
+      "label": "nested range and lookup formula",
+      "formula": "INDEX(AC9:AL9,MATCH(I9,AC8:AL8,0))*L9",
+      "ast": {
+        "type": "BinaryExpression",
+        "left": {
+          "type": "FormulaCallExpression",
+          "name": "INDEX",
+          "arguments": [
+            {
+              "type": "ArrayExpression",
+              "elements": [
+                { "type": "CellReference", "ref": "AC9", "sheet": null },
+                { "type": "CellReference", "ref": "AD9", "sheet": null },
+                { "type": "CellReference", "ref": "AE9", "sheet": null },
+                { "type": "CellReference", "ref": "AF9", "sheet": null },
+                { "type": "CellReference", "ref": "AG9", "sheet": null },
+                { "type": "CellReference", "ref": "AH9", "sheet": null },
+                { "type": "CellReference", "ref": "AI9", "sheet": null },
+                { "type": "CellReference", "ref": "AJ9", "sheet": null },
+                { "type": "CellReference", "ref": "AK9", "sheet": null },
+                { "type": "CellReference", "ref": "AL9", "sheet": null }
+              ]
+            },
+            {
+              "type": "FormulaCallExpression",
+              "name": "MATCH",
+              "arguments": [
+                { "type": "CellReference", "ref": "I9", "sheet": null },
+                {
+                  "type": "ArrayExpression",
+                  "elements": [
+                    { "type": "CellReference", "ref": "AC8", "sheet": null },
+                    { "type": "CellReference", "ref": "AD8", "sheet": null },
+                    { "type": "CellReference", "ref": "AE8", "sheet": null },
+                    { "type": "CellReference", "ref": "AF8", "sheet": null },
+                    { "type": "CellReference", "ref": "AG8", "sheet": null },
+                    { "type": "CellReference", "ref": "AH8", "sheet": null },
+                    { "type": "CellReference", "ref": "AI8", "sheet": null },
+                    { "type": "CellReference", "ref": "AJ8", "sheet": null },
+                    { "type": "CellReference", "ref": "AK8", "sheet": null },
+                    { "type": "CellReference", "ref": "AL8", "sheet": null }
+                  ]
+                },
+                { "type": "Literal", "value": 0 }
+              ]
+            }
+          ]
+        },
+        "operator": "*",
+        "right": {
+          "type": "CellReference",
+          "ref": "L9",
+          "sheet": null
+        }
+      },
+      "debug": "Formula.INDEX([this.AC9,this.AD9,this.AE9,this.AF9,this.AG9,this.AH9,this.AI9,this.AJ9,this.AK9,this.AL9],Formula.MATCH(this.I9,[this.AC8,this.AD8,this.AE8,this.AF8,this.AG8,this.AH8,this.AI8,this.AJ8,this.AK8,this.AL8],0))*this.L9"
+    },
+    {
+      "label": "concatenation shorthand",
+      "formula": "A&B",
+      "ast": {
+        "type": "BinaryExpression",
+        "left": {
+          "type": "CellReference",
+          "ref": "A",
+          "sheet": null
+        },
+        "operator": "&",
+        "right": {
+          "type": "CellReference",
+          "ref": "B",
+          "sheet": null
+        }
+      },
+      "debug": "this.A+\"\"+this.B"
+    },
+    {
+      "label": "percentage plus reference",
+      "formula": "100%+D4",
+      "ast": {
+        "type": "BinaryExpression",
+        "left": {
+          "type": "Literal",
+          "value": 1
+        },
+        "operator": "+",
+        "right": {
+          "type": "CellReference",
+          "ref": "D4",
+          "sheet": null
+        }
+      },
+      "debug": "1+this.D4"
+    },
+    {
+      "label": "nested aggregate functions",
+      "formula": "SUM(A1:B2)+AVERAGE(C1:C2)",
+      "ast": {
+        "type": "BinaryExpression",
+        "left": {
+          "type": "FormulaCallExpression",
+          "name": "SUM",
+          "arguments": [
+            {
+              "type": "ArrayExpression",
+              "elements": [
+                { "type": "CellReference", "ref": "A1", "sheet": null },
+                { "type": "CellReference", "ref": "B1", "sheet": null },
+                { "type": "CellReference", "ref": "A2", "sheet": null },
+                { "type": "CellReference", "ref": "B2", "sheet": null }
+              ]
+            }
+          ]
+        },
+        "operator": "+",
+        "right": {
+          "type": "FormulaCallExpression",
+          "name": "AVERAGE",
+          "arguments": [
+            {
+              "type": "ArrayExpression",
+              "elements": [
+                { "type": "CellReference", "ref": "C1", "sheet": null },
+                { "type": "CellReference", "ref": "C2", "sheet": null }
+              ]
+            }
+          ]
+        }
+      },
+      "debug": "Formula.SUM([this.A1,this.B1,this.A2,this.B2])+Formula.AVERAGE([this.C1,this.C2])"
+    },
+    {
+      "label": "if with range and error fallback",
+      "formula": "IF(A1=\"\",SUM(B1:B3),#VALUE!)",
+      "ast": {
+        "type": "FormulaCallExpression",
+        "name": "IF",
+        "arguments": [
+          {
+            "type": "BinaryExpression",
+            "left": {
+              "type": "CellReference",
+              "ref": "A1",
+              "sheet": null
+            },
+            "operator": "==",
+            "right": {
+              "type": "Literal",
+              "value": ""
+            }
+          },
+          {
+            "type": "FormulaCallExpression",
+            "name": "SUM",
+            "arguments": [
+              {
+                "type": "ArrayExpression",
+                "elements": [
+                  { "type": "CellReference", "ref": "B1", "sheet": null },
+                  { "type": "CellReference", "ref": "B2", "sheet": null },
+                  { "type": "CellReference", "ref": "B3", "sheet": null }
+                ]
+              }
+            ]
+          },
+          {
+            "type": "ErrorLiteral",
+            "code": "#VALUE!"
+          }
+        ]
+      },
+      "debug": "Formula.IF(this.A1==\"\",Formula.SUM([this.B1,this.B2,this.B3]),#VALUE!)"
+    }
+  ],
+  "invalid": [
+    {
+      "label": "unterminated string literal",
+      "formula": "IF(\"unterminated,1,0)",
+      "message": "Expected \"\\\"\", \"\\\"\\\"\", or [^\"\\n] but end of input found.",
+      "location": {
+        "start": { "offset": 21, "line": 1, "column": 22 },
+        "end": { "offset": 21, "line": 1, "column": 22 }
+      }
+    },
+    {
+      "label": "double comma in argument list",
+      "formula": "SUM(A1,,A2)",
+      "message": "Expected \"#DIV/0!\", \"#N/A\", \"#NAME?\", \"#REF!\", \"#VALUE!\", \"'\", \"(\", \"\\\"\", [$A-Z_a-z], [+\\-], [0-9], or whitespace but \",\" found.",
+      "location": {
+        "start": { "offset": 7, "line": 1, "column": 8 },
+        "end": { "offset": 8, "line": 1, "column": 9 }
+      }
+    },
+    {
+      "label": "sheet reference without cell",
+      "formula": "Sheet1!",
+      "message": "Expected [$A-Z_a-z] but end of input found.",
+      "location": {
+        "start": { "offset": 7, "line": 1, "column": 8 },
+        "end": { "offset": 7, "line": 1, "column": 8 }
+      }
+    }
+  ]
+}

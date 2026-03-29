@@ -1,19 +1,40 @@
 #!/usr/bin/env node
 
-var optimist = require('optimist'),
-  Excellent = require('../lib').Excellent;
+'use strict';
 
-// optimist is a great library for taking the hassle
-// out of parsing CLI options.
-var argv = optimist
-  .options('h', {
-    alias: 'hello',
-    describe: 'print hello world message.'
-  }).argv;
+var fs = require('fs');
+var path = require('path');
+var excellentPackage = require('..');
 
-if (argv.hello) {
-  var hello = new Hello();
-  console.log(hello.sayHello());
-} else {
-  console.log(optimist.help());
+function writeStdout(message) {
+  process.stdout.write(message + '\n');
 }
+
+function writeStderr(message) {
+  process.stderr.write(message + '\n');
+}
+
+function printUsage() {
+  writeStdout('Usage: excellent <path-to.xlsx>');
+}
+
+async function main() {
+  var inputPath = process.argv[2];
+
+  if (!inputPath || inputPath === '--help' || inputPath === '-h') {
+    printUsage();
+    process.exit(inputPath ? 0 : 1);
+  }
+
+  var resolvedPath = path.resolve(process.cwd(), inputPath);
+  var xlsxFile = fs.readFileSync(resolvedPath);
+  var reader = new excellentPackage.XlsxReader();
+  var parsed = await reader.load(xlsxFile);
+
+  writeStdout(JSON.stringify(parsed.workbook, null, 2));
+}
+
+main().catch(function(err) {
+  writeStderr(String(err && (err.stack || err)));
+  process.exit(1);
+});

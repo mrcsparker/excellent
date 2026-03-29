@@ -6,40 +6,87 @@
     "xlsx",
     "parser"
   ],
-  "directories": {
-    "lib": "./lib"
-  },
-  "main": "./lib/index.js",
-  "author": "Chris Parker",
-  "engines": [
-    "node"
+  "files": [
+    "LICENSE.txt",
+    "README.md",
+    "browser.mjs",
+    "browser.js",
+    "bin/",
+    "dist/",
+    "generated/",
+    "index.js"
   ],
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.mjs",
+      "require": "./dist/index.js",
+      "default": "./dist/index.mjs"
+    },
+    "./browser": {
+      "types": "./dist/index.d.ts",
+      "import": "./browser.mjs",
+      "require": "./browser.js",
+      "default": "./browser.mjs"
+    },
+    "./package.json": "./package.json"
+  },
+  "bin": {
+    "excellent": "./bin/excellent.js"
+  },
+  "author": "Chris Parker",
+  "engines": {
+    "node": ">=20.13.0"
+  },
   "scripts": {
-    "test": "make test"
+    "build": "npm run build:runtime && npm run build:browser",
+    "build:browser": "npm run build:parser && node ./scripts/build-browser.js",
+    "build:clean": "node ./scripts/clean-build.js",
+    "build:module": "node ./scripts/build-module.js",
+    "build:parser": "node ./scripts/build-parser.js",
+    "build:runtime": "npm run build:clean && npm run build:runtime:core",
+    "build:runtime:core": "npm run build:parser && tsc -p ./tsconfig.runtime.json && npm run build:module",
+    "build:test-fixtures": "node ./scripts/generate-test-fixtures.js",
+    "bench:evaluation": "npm run build:runtime && node ./scripts/benchmark-evaluation.js",
+    "coverage": "npm run coverage:clean && npm run lint && c8 node --test test/evaluator/**/*_spec.js test/parser/**/*_spec.js test/public-api/**/*_spec.js test/workbook-model/**/*_spec.js test/xlsx-integration/**/*_spec.js",
+    "coverage:clean": "node -e \"require('node:fs').rmSync('coverage', { recursive: true, force: true })\"",
+    "lint": "npm run build:runtime && eslint . --max-warnings 0 && tsc -p ./tsconfig.types.json --noEmit",
+    "lint:fix": "eslint . --fix",
+    "prepack": "npm run build",
+    "prepare": "npm run build:runtime:core",
+    "profile:xlsx-load": "npm run build:runtime && node ./scripts/profile-xlsx-load.js",
+    "test:browser": "npm run build:browser && node --test test/browser-smoke/**/*_spec.js",
+    "test:specs": "node --test test/evaluator/**/*_spec.js test/parser/**/*_spec.js test/public-api/**/*_spec.js test/workbook-model/**/*_spec.js test/xlsx-integration/**/*_spec.js",
+    "typecheck": "npm run build:runtime && tsc -p ./tsconfig.types.json --noEmit",
+    "test": "npm run lint && npm run test:specs"
   },
   "repository": {
     "type": "git",
     "url": "git@github.com:mrcsparker/excellent.git"
   },
   "dependencies": {
-    "formulajs": "1.0.5",
-    "jszip": "git://github.com/Stuk/jszip.git",
-    "pegjs": "*",
-    "traceur": "0.0.72",
-    "underscore": ">=1.4.3",
-    "xmldom": "*"
+    "@formulajs/formulajs": "^4.5.6",
+    "@xmldom/xmldom": "^0.8.11",
+    "acorn": "^8.16.0",
+    "jszip": "^3.10.1"
   },
   "devDependencies": {
-    "browserify": "*",
-    "fs-extra": "*",
-    "gulp": "^3.8.9",
-    "gulp-jscs": "^1.2.1",
-    "gulp-jshint": "^1.8.5",
-    "gulp-mocha": "^1.1.1",
-    "gulp-traceur": "^0.13.0",
-    "gulp-util": "^3.0.1",
-    "jshint-stylish": "^1.0.0",
-    "mocha": "^2.0.1",
-    "optimist": ">=0.3.4"
+    "@eslint/js": "^9.39.4",
+    "c8": "^11.0.0",
+    "esbuild": "^0.27.4",
+    "eslint": "^9.39.4",
+    "eslint-plugin-import": "^2.32.0",
+    "eslint-plugin-n": "^17.24.0",
+    "eslint-plugin-promise": "^7.2.1",
+    "eslint-plugin-sonarjs": "^4.0.2",
+    "fast-check": "^4.6.0",
+    "globals": "^17.4.0",
+    "hyperformula": "^3.2.0",
+    "peggy": "^5.1.0",
+    "playwright": "^1.58.2",
+    "typescript": "^5.9.3",
+    "typescript-eslint": "^8.57.2"
   }
 }

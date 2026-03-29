@@ -1,0 +1,14 @@
+{
+  "all": true,
+  "exclude-after-remap": true,
+  "include": [
+    "src/**/*.ts"
+  ],
+  "report-dir": "coverage",
+  "reporter": [
+    "text",
+    "json-summary",
+    "lcov"
+  ],
+  "temp-directory": "coverage/tmp"
+}
